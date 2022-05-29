@@ -225,7 +225,10 @@ kubectl get svc
 - kubectl get svc で表示されるEXTENAL IPにWebブラウザでアクセスし、WordPressの初期画面が表示されれば成功です。
 
 ※セキュリティグループの設定でアクセス制限を行なってください。
+[TODO]:セキュリティグループの設定方法を記載する
 
 ## [TODO]Appendix
 ### Self-Healing
 ### Scaleout
+
+### S3へのマウント
