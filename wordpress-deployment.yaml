@@ -18,17 +18,20 @@ spec:
         tier: frontend
     spec:
       containers:
-        #- image: wordpress:4.8-apache
-        - image: wordpress-test:minikube
+        - image: wordpress:4.8-apache
+          #- image: AWS:image
           name: wordpress
+          imagePullPolicy: Always
           env:
             - name: WORDPRESS_DB_HOST
               value: wordpress-mysql
             - name: WORDPRESS_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-pass
-                  key: password
+              value: password
+              # kustomization.ymlを使用する際はこちらを使用してください
+              #valueFrom:
+              #  secretKeyRef:
+              #    name: mysql-pass
+              #    key: password
           ports:
             - containerPort: 80
               name: wordpress
