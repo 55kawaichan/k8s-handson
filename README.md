@@ -1,13 +1,6 @@
 # k8sハンズオン
-## 事前準備
-- 各種ミドルウェアは事前にインストールをお願いします。
-  - Docker
-  - kubectl
-    - [こちらのリンク](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)を参考にkubectlをインストールしてください
-  - minikube
-    - [こちらのリンク](https://minikube.sigs.k8s.io/docs/start/)を参考にminikubeをインストールしてください
-
 ## ハンズオン
+WordPress環境(WordPress/MySQL)をminikubeとEKSで構築します。ハンズオンは段階を踏んで構築できるような内容になっています。appendixは応用編の位置付けで少し難しい内容を記載しています。
 - [minikube](./handson_minikube.md)
 - [EKS](./handson_EKS.md)
 - [appendix](./handson_appendix.md)

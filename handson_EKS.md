@@ -1,10 +1,18 @@
 # EKSでのKubernetes構築
 [Amazon EKS の開始方法 – AWS Management Console と AWS CLI](https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/getting-started-console.html)に沿って構築を行います。構築にはマネジメントコンソールとeksctlの2通りの方法がありますが、今回は段階を踏んで構築したいため、マネジメントコンソールから作成します。
 
-### 事前準備
-下記ツールのインストールおよび設定を行います。
-- [aws CLI](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-install.html)
-- [Amazon EKS クラスター の IAM ロール作成](https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/service_IAM_role.html)
+## 事前準備
+- 各種ミドルウェアは事前にインストールをお願いします。
+
+| ミドルウェア         | version  | 備考                                              |
+| -------------- | -------- | ----------------------------------------------- |
+| docker         | 20.10.14 | DockerDesktopをインストールする場合はインストール不要です             |
+| docker-compose | 1.29.2   | DockerDesktopをインストールする場合はインストール不要です             |
+| [DockerDesktop](https://www.docker.com/products/docker-desktop/)  | 4.7.1    | docker, docker-composeを個別にインストールする場合はインストール不要です |
+| [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)        | 1.22.5   |                                                 |
+| [minikube](https://minikube.sigs.k8s.io/docs/start/) | 1.25.2   |                                                 |
+| [aws CLI](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-install.html) |  20.10.14
+| [Amazon EKS クラスター の IAM ロール作成](https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/service_IAM_role.html)        | -          |                                                 |
 
 ### Amazon EKS クラスターの作成
 - CloudFromationから、VPCを作成します。

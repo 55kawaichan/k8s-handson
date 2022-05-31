@@ -1,4 +1,15 @@
 # minikubeでのKubernetes構築
+
+## 事前準備
+- 各種ミドルウェアは事前にインストールをお願いします。
+
+| ミドルウェア         | version  | 備考                                              |
+| -------------- | -------- | ----------------------------------------------- |
+| docker         | 20.10.14 | DockerDesktopをインストールする場合はインストール不要です             |
+| docker-compose | 1.29.2   | DockerDesktopをインストールする場合はインストール不要です             |
+| [DockerDesktop](https://www.docker.com/products/docker-desktop/)  | 4.7.1    | docker, docker-composeを個別にインストールする場合はインストール不要です |
+| [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)        | 1.22.5   |                                                 |
+| [minikube](https://minikube.sigs.k8s.io/docs/start/) | 1.25.2   |                                                 |
 ## Kubernetesの基礎
 Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから成り立っています。
 
