@@ -10,6 +10,7 @@
 | [DockerDesktop](https://www.docker.com/products/docker-desktop/)  | 4.7.1    | docker, docker-composeを個別にインストールする場合はインストール不要です |
 | [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)        | 1.22.5   |                                                 |
 | [minikube](https://minikube.sigs.k8s.io/docs/start/) | 1.25.2   |                                                 |
+| [mysql](https://dev.mysql.com/doc/refman/5.6/ja/installing.html) | 8.0.29    | mysqlの起動確認をする場合に必要です                                                |
 ## Kubernetesの基礎
 Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから成り立っています。
 
@@ -51,6 +52,11 @@ kubectl apply -k ./
 
 # 起動確認
 kubectl get pods
+
+# podの詳細確認(podが起動しない場合などに実行します)
+kubectl describe pod $(pod_id)
+
+# log確認(-f を付与することでtailが可能です)
 kubectl logs wordpress-mysql
 
 # ポートフォワード
@@ -83,7 +89,7 @@ cd manifest
 kubectl apply -k ./
 
 # PersistentVolumeの確認
-kubectl get persistentvolume
+kubectl pvc
 ```
 
 ## WordPressの起動
