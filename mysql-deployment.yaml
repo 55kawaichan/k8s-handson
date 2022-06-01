@@ -20,16 +20,11 @@ spec:
       containers:
         - image: mysql:5.6
           # for M1 Mac minikube
-          #- image: mysql/mysql-server:latest
+          #- image: mysql/mysql-server:5.6
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: password
-              # kustomization.ymlを使用する際はこちらを使用してください
-              #valueFrom:
-              #  secretKeyRef:
-              #    name: mysql-pass
-              #    key: password
             - name: MYSQL_ROOT_HOST
               value: "%"
           ports:

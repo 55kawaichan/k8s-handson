@@ -35,11 +35,10 @@ Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから
 ## [TODO]Podやレプリカセット等の説明
 - Node
 - Pod
-- レプリカセット
+- ReplicaSet
 
-## mysqlの起動
-チュートリアルのページではMySQLとWordpressのマニフェストファイルを作成し、一気に起動していますが、まずはMySQLの起動から確認します。
-[TODO]:kustomizeは使用しないようにする
+## MySQLの起動
+まずはMySQLの起動から確認します。
 
 ```
 # minikube起動
@@ -47,32 +46,35 @@ minikube start
 minikube dashboad
 
 # MySQL起動
-cd manifest
-kubectl apply -k ./
+kubectl apply -f mysql-deployment.yaml
 
 # 起動確認
-kubectl get pods
+kubectl get pod
 
 # podの詳細確認(podが起動しない場合などに実行します)
-kubectl describe pod $(pod_id)
+kubectl describe pod $(pod_name)
 
 # log確認(-f を付与することでtailが可能です)
-kubectl logs wordpress-mysql
+kubectl logs $(pod_name)
 
 # ポートフォワード
 kubectl port-forward wordpress-mysql(pod id) 13306:3306
 
 # mysqlログイン
  mysql -s -uroot -p -h 127.0.0.1 --port=13306 
+ show databases;
 ```
 
 MySQLのデータはPod上に存在しますが、Podが停止した場合DBのデータも消えてしまうため、PersistentVolumeで永続化します。<br>
 
 ```
-# manifest/kustomization.yamlのコメントアウトを解除
-  #  - mysql-persistentvolumeclaim.yaml
+# 現在のPodを削除
+kubectl delete -f mysql-deployment.yaml
 
-# manifest/mysql-deployment.yamlのコメントアウトを解除
+# 削除できたか確認
+kubectl get pod
+
+# mysql-deployment.yamlのコメントアウトを解除
     #volumeMounts:
     #  - name: mysql-persistent-storage
     #    mountPath: /var/lib/mysql
@@ -81,49 +83,88 @@ MySQLのデータはPod上に存在しますが、Podが停止した場合DBの�
 #    persistentVolumeClaim:
 #      claimName: mysql-pv-claim
 
-# 現在のPodを削除
-kubectl delete pod wordpress-mysql(pod id)
-
-# 再起動
-cd manifest
-kubectl apply -k ./
+# PersistentVolumeClaimの起動
+kubectl apply -f mysql-persistentvolumeclaim.yaml
 
 # PersistentVolumeの確認
-kubectl pvc
+kubectl get pvc
+
+# MySQL起動
+kubectl apply -f mysql-deployment.yaml
+
+# 起動確認
+kubectl get pod
 ```
+
+起動の確認ができたら、一旦Podを削除します。
+```
+kubectl delete -f mysql-deployment.yaml,mysql-persistentvolumeclaim.yaml,mysql-service.yaml
+
+```
+
 
 ## WordPressの起動
-MySQLと同様に、ファイルをmanifestに移動し、以下のコマンドを実行してください。
-- wordpress-deployment.yaml
-- wordpress-persistentvolumeclaim.yaml
-- wordpress-service.yaml
-- Dockerfile
+
+### WordPressのイメージビルド
+Dockerfileから自作イメージを作成します。
 
 ```
-# manifest/kustomization.yamlのコメントアウトを解除
-#  - wordpress-deployment.yaml
-#  - wordpress-service.yaml
-#  - wordpress-persistentvolumeclaim.yaml
-
-# wordpressのイメージをminikube内でbuildするようにDockerクライアントの向き先（DOCKER ENDPOINT）を変更
+# WordPressのイメージをminikube内でbuildするようにDockerクライアントの向き先（DOCKER ENDPOINT）を変更
 docker context ls
 eval $(minikube docker-env)
 
-# wordpressのイメージをビルド
+# WordPressのイメージをビルド
 docker build -t wp-k8s-handson:minikbe .
-
-[TODO]kustomizeを使用しない場合の起動方法
-# WordPress, MySQL起動
-cd manifest
-kubectl apply -k ./
-
-# 起動確認
-kubectl get pods
-kubectl logs wordpress
-
-# WordPress Serviceのアドレスを取得
-minikube service wordpress --url
 ```
-取得したアドレスでブラウザからアクセスし、WordPressの初期画面が表示されれば成功です！
 
-MySQLとWordPressの接続はそれぞれServiceリソースが行なっています。Serviceのマニフェストファイルの説明をします。
+### Volume作成
+MySQLとWordPressのPersistentVolumeClaimを作成します。
+```
+kubectl apply -f mysql-persistentvolumeclaim.yaml
+kubectl apply -f wordpress-persistentvolumeclaim.yaml
+
+# 確認
+kubectl get pvc
+```
+
+### Service作成
+MySQLとWordPressが通信できるようにネットワークを作成します。
+```
+kubectl apply -f mysql-service.yaml
+kubectl apply -f wordpress-service.yaml
+```
+
+### Pod作成
+deploymentリソースからPodを作成します。
+```
+# MySQL起動
+kubectl apply -f mysql-deployment.yaml
+
+# MySQL起動確認
+kubectl get pods
+
+# WordPress起動
+kubectl apply -f wordpress-deployment.yaml
+
+# WordPress起動確認
+kubectl get pods
+kubectl logs $(wordpress_pod_name)
+```
+
+### WordPressのアドレスを取得
+別ターミナルを開き、下記コマンドを実行します。※確認が完了するまではターミナルを閉じないでください。
+```
+minikube tunnel
+```
+
+下記コマンドを実行し、LoadBalancerの EXTERNAL-IP,PORTを確認します。
+```
+kubectl get svc
+        NAME              TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+        kubernetes        ClusterIP      10.96.0.1        <none>        443/TCP        22m
+(※ココ！)wordpress         LoadBalancer   10.110.205.210   127.0.0.1     80:30871/TCP   20m
+        wordpress-mysql   ClusterIP      None             <none>        3306/TCP       20m
+
+```
+
+取得したアドレスでブラウザからアクセスし、WordPressの初期画面が表示されれば成功です！
