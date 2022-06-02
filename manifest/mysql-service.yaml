@@ -10,4 +10,3 @@ spec:
   selector:
     app: wordpress
     tier: mysql
-  clusterIP: None

@@ -11,8 +11,8 @@ https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/autoscaling.html
 - Karpenter
 
 ### 初期データの登録方法
-- ConfigMapでDDLなどは参照可能とした
+####  ConfigMapでDDLを参照する
 
-- initContanerでpublicディレクトリの内容を配置した（initial.sqlもちょっと大きかったのですが、まぁサンプルということで同様としています）
+#### initContanerで初期データを配置する
 
-- 画像ファイルはinit-images-jobを作成してPVに保存したい
+#### 画像ファイルをinit-images-jobを作成してPVに保存する

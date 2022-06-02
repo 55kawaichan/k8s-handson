@@ -10,9 +10,6 @@
 | docker-compose | 1.29.2   | DockerDesktopをインストールする場合はインストール不要です             |
 | [DockerDesktop](https://www.docker.com/products/docker-desktop/)  | 4.7.1    | docker, docker-composeを個別にインストールする場合はインストール不要です |
 | [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)        | 1.22.5   |                                                 |
-| [minikube](https://minikube.sigs.k8s.io/docs/start/) | 1.25.2   |                                                 |
-| [aws CLI](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-install.html) |  20.10.14
-| [Amazon EKS クラスター の IAM ロール作成](https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/service_IAM_role.html)        | -          |                                                 |
 
 ### Amazon EKS クラスターの作成
 - CloudFromationから、VPCを作成します。
@@ -64,23 +61,15 @@
     - ディスクサイズ：60GiB
 - 以降の項目はデフォルトでノードを作成します。
 
-## アプリケーションのデプロイ
-### Volumeの作成
-- マニフェストからPersistent Volume Claimを作成します。
-```
-# pvcの作成
-kubectl apply -f mysql-persistentvolumeclaim.yaml,wordpress-persistentvolumeclaim.yaml
-
-# ステータスの確認
-kubectl get pvc
-```
-### ECRへのDockerImage登録
+## ECRへのDockerImage登録
 wordpressのイメージは自作イメージ想定なので、DockerfileよりイメージをビルドしECRにプッシュします。EKSではECRに登録したwordpressのイメージを参照します。
 - ECRのコンソールを開き、リポジトリを作成します。
 - ページ上部の「プッシュコマンドを表示」から、イメージをプッシュします。
 ```
 # ECRにログイン
-aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $(アカウント情報)
+cd eksctl
+docker compose up -d
+docker exec -it $(docker_container_id) aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $(アカウント情報)
 
 # Dockerビルド
 docker build -t wp-k8s-handson:minikube .
@@ -90,6 +79,17 @@ docker tag wp-k8s-handson:minikube $(アカウント情報)/wp-k8s-handson:minik
 
 # イメージのプッシュ
 docker push $(アカウント情報)/wp-k8s-handson:minikube
+```
+
+## アプリケーションのデプロイ
+### Volumeの作成
+- マニフェストからPersistent Volume Claimを作成します。
+```
+# pvcの作成
+kubectl apply -f mysql-persistentvolumeclaim.yaml,wordpress-persistentvolumeclaim.yaml
+
+# ステータスの確認
+kubectl get pvc
 ```
 
 ### Serviceの作成

@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  eksctl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eksctl
+    tty: true
+    volumes:
+      - ../manifest:/workdir/k8s
+    #env_file:
+    #  - .env
+    environment:
+      AWS_DEFAULT_REGION: ap-northeast-1
+      AWS_DEFAULT_OUTPUT: json
