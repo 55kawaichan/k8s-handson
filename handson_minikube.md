@@ -10,7 +10,6 @@
 | [DockerDesktop](https://www.docker.com/products/docker-desktop/)  | 4.7.1    | docker, docker-composeを個別にインストールする場合はインストール不要です |
 | [kubectl](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)        | 1.22.5   |                                                 |
 | [minikube](https://minikube.sigs.k8s.io/docs/start/) | 1.25.2   |                                                 |
-| [mysql](https://dev.mysql.com/doc/refman/5.6/ja/installing.html) | 8.0.29    | mysqlの起動確認をする場合に必要です                                                |
 ## Kubernetesの基礎
 Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから成り立っています。
 
@@ -32,10 +31,15 @@ Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから
 | Service    | コンテナを外部公開するようなエンドポイントを提供するリソース |
 | PersitentVolumeClaim    | 永続化領域を利用するためのリソース |
 
-## [TODO]Podやレプリカセット等の説明
+## 簡単な用語説明
+- Cluster
+  - Kubernetesのリソースを管理する集合体。リソースはNodeやPodが含まれる。
 - Node
+  - コンテナをデプロイするためのサーバー
+  - 複数NodeをまとめたものがCluster
 - Pod
-- ReplicaSet
+  - 1つ以上のコンテナの集合体
+  - Pod単位でコンテナが作成、開始、終了、削除する
 
 ## MySQLの起動
 まずはMySQLの起動から確認します。
@@ -46,6 +50,7 @@ minikube start
 minikube dashboad
 
 # MySQL起動
+cd manifest
 kubectl apply -f mysql-deployment.yaml
 
 # 起動確認
@@ -60,8 +65,14 @@ kubectl logs $(pod_name)
 # ポートフォワード
 kubectl port-forward wordpress-mysql(pod id) 13306:3306
 
+# MySQLのCLUSTER-IP確認
+kubectl get svc
+
+# minikubeのワーカーノードに接続
+minikube ssh
+
 # mysqlログイン
- mysql -s -uroot -p -h 127.0.0.1 --port=13306 
+ docker run -it --rm mysql mysql -uroot -p -h $(wordpress-mysql CLUSTER-IP)
  show databases;
 ```
 
