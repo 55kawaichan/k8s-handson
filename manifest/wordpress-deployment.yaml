@@ -9,8 +9,6 @@ spec:
     matchLabels:
       app: wordpress
       tier: frontend
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -18,7 +16,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - image: wp-k8s-handson:minikbe
+        - image: wp-k8s-handson:minikube
           #- image: AWS:image
           name: wordpress
           # EKSの場合に有効化してください

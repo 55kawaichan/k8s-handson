@@ -47,23 +47,25 @@ Kubernetesは、Kubernetes MasterとKubernetes Node の2種類のノードから
 ```
 # minikube起動
 minikube start
-minikube dashboad
+
+# 下記コマンドを実行するとブラウザ上でminikubeの状態を確認できます。
+# 実行する場合は、別のターミナルで実行してください。開かない場合はターミナル上のURLをブラウザに入力してください。
+minikube dashboard
 
 # MySQL起動
+# ※M1 Macの方はmysql-deployment.yamlのmysqlイメージを「mysql/mysql-server:5.6」に変更してください
 cd manifest
 kubectl apply -f mysql-deployment.yaml
+kubectl apply -f mysql-service.yaml
 
 # 起動確認
 kubectl get pod
 
-# podの詳細確認(podが起動しない場合などに実行します)
-kubectl describe pod $(pod_name)
+# Podの詳細確認(Podが起動しない場合などに実行します)
+kubectl describe pod $(kubectl get pod で取得したNAME)
 
 # log確認(-f を付与することでtailが可能です)
-kubectl logs $(pod_name)
-
-# ポートフォワード
-kubectl port-forward wordpress-mysql(pod id) 13306:3306
+kubectl logs $(kubectl get pod で取得したNAME)
 
 # MySQLのCLUSTER-IP確認
 kubectl get svc
@@ -71,9 +73,27 @@ kubectl get svc
 # minikubeのワーカーノードに接続
 minikube ssh
 
-# mysqlログイン
- docker run -it --rm mysql mysql -uroot -p -h $(wordpress-mysql CLUSTER-IP)
- show databases;
+# MySQLログイン
+# windowsの場合
+docker run -it --rm mysql mysql -uroot -p --password=password -h $(kubectl get svcで出力されたwordpress-mysqlのCLUSTER-IP)
+
+# M1 Macの場合
+docker run -it --rm --platform linux/x86_64 mysql mysql -uroot -p --password=password -h $(kubectl get svcで出力されたwordpress-mysqlのCLUSTER-IP)
+
+# database作成
+create database k8s_handson;
+
+# k8s_handsonのDBが存在することを確認
+show databases;
+
+# k8s_handsonのDBがどうなるか確認します
+# 一旦MySQLのPodを削除・再作成
+kubectl delete -f mysql-deployment.yaml
+kubectl apply -f mysql-deployment.yaml
+
+# MySQLログイン（前述のコマンド参照）
+# k8s_handsonのDBが消えていることを確認
+show databases;
 ```
 
 MySQLのデータはPod上に存在しますが、Podが停止した場合DBのデータも消えてしまうため、PersistentVolumeで永続化します。<br>
@@ -124,13 +144,17 @@ Dockerfileから自作イメージを作成します。
 docker context ls
 eval $(minikube docker-env)
 
+# ルートディレクトリに移動
+cd ..
+
 # WordPressのイメージをビルド
-docker build -t wp-k8s-handson:minikbe .
+docker build -t wp-k8s-handson:minikube .
 ```
 
 ### Volume作成
 MySQLとWordPressのPersistentVolumeClaimを作成します。
 ```
+cd manifest
 kubectl apply -f mysql-persistentvolumeclaim.yaml
 kubectl apply -f wordpress-persistentvolumeclaim.yaml
 
@@ -179,3 +203,8 @@ kubectl get svc
 ```
 
 取得したアドレスでブラウザからアクセスし、WordPressの初期画面が表示されれば成功です！
+
+ハンズオンが終わったら、minikubeを削除してください。
+```
+minikube delete
+```
