@@ -69,7 +69,7 @@ wordpressのイメージは自作イメージ想定なので、Dockerfileより�
 # ECRにログイン
 cd eksctl
 docker compose up -d
-docker exec -it $(docker_container_id) aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $(アカウント情報)
+docker exec -it $(eksctlのコンテナID) aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $(アカウント情報)
 
 # Dockerビルド
 docker build -t wp-k8s-handson:minikube .
